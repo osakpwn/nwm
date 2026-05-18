@@ -173,6 +173,36 @@ int main() {
 			}
 			break;
 		}
+		case ConfigureRequest: {
+			XConfigureRequestEvent *ev = &e.xconfigurerequest;
+			XWindowChanges changes = {
+				.x = ev->x,
+				.y = ev->y,
+				.width = ev->width,
+				.height = ev->height,
+				.border_width = ev->border_width,
+				.sibling = ev->above,
+				.stack_mode = ev->detail,
+			};
+			XConfigureWindow(display, ev->window, ev->value_mask, &changes);
+
+			XConfigureEvent ce = {
+				.type = ConfigureNotify,
+				.display = display,
+				.event = ev->window,
+				.window = ev->window,
+				.x = ev->x,
+				.y = ev->y,
+				.width = ev->width,
+				.height = ev->height,
+				.border_width = ev->border_width,
+				.above = None,
+				.override_redirect = False,
+			};
+			XSendEvent(display, ev->window, False, StructureNotifyMask,
+					   (XEvent *)&ce);
+			break;
+		}
 		}
 
 		on_window_focus(display, focused_client, move_window, resize_window);

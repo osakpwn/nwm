@@ -42,6 +42,10 @@ void on_window_focus(Display *display, client_t *focused_client,
 void map_window(Display *display, Window *root, client_t **client_head,
 				client_t **focused_client, XMapRequestEvent *mr) {
 	XWindowAttributes win_attr = get_window_attr(display, &mr->window);
+
+	if (win_attr.override_redirect)
+		return;
+
 	client_t *c = malloc(sizeof(client_t));
 	c->win = mr->window;
 	c->x = win_attr.x;
