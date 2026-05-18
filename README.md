@@ -2,6 +2,7 @@
 
 X11 window manager to fix the issues with meadow.
 
+### Screenshot
 
 ### Actual features 
 - opens (yayy)
@@ -12,7 +13,7 @@ X11 window manager to fix the issues with meadow.
 
 ### Things to be added 
 - Unique window display system
-
+![Screenshot](./static/screenshot.png) 
 
 ### How to configure 
 Edit the macros defined at the top of `main.c` and recompile
