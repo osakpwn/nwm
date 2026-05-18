@@ -19,6 +19,7 @@ typedef struct client_t {
 
 XWindowAttributes get_window_attr(Display *display, Window *win);
 void add_window_to_list(client_t **client_head, client_t *c);
+void remove_window_from_list(client_t **client_head, client_t *c);
 void on_window_focus(Display *display, client_t *client_focused,
 					 bool move_window, bool resize_window);
 void map_window(Display *display, Window *root, client_t **client_head,

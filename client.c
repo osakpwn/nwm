@@ -8,6 +8,27 @@ void add_window_to_list(client_t **client_head, client_t *c) {
 	*client_head = c;
 }
 
+void remove_window_from_list(client_t **client_head, client_t *c) {
+	client_t *prev = NULL;
+	client_t *cur = *client_head;
+
+	while (cur != NULL && cur != c) {
+		prev = cur;
+		cur = cur->next;
+	}
+
+	if (cur == NULL)
+		return;
+
+	if (prev == NULL) {
+		*client_head = cur->next;
+	} else {
+		prev->next = cur->next;
+	}
+
+	free(cur);
+}
+
 XWindowAttributes get_window_attr(Display *display, Window *win) {
 	XWindowAttributes xc;
 	XGetWindowAttributes(display, *win, &xc);

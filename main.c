@@ -167,6 +167,7 @@ int main() {
 		case DestroyNotify: {
 			Window win = e.xdestroywindow.window;
 			if (focused_client != NULL && focused_client->frame == win) {
+				remove_window_from_list(&client_head, focused_client);
 				focused_client = NULL;
 				move_window = false;
 				resize_window = false;
