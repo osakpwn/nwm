@@ -41,6 +41,15 @@ void grab_key_from_string(const char *k, unsigned int mod) {
 	XGrabKey(display, kcode, mod, root, True, GrabModeAsync, GrabModeAsync);
 }
 
+int error_handler(Display *d, XErrorEvent *ee) {
+	if (ee->error_code == BadWindow || ee->error_code == BadDrawable ||
+		ee->error_code == BadMatch) {
+		return 0; // Ignore safely
+	}
+	fprintf(stderr, "Fatal X11 WM Error: %d\n", ee->error_code);
+	return 0;
+}
+
 int main() {
 	display = XOpenDisplay(NULL);
 	root = XDefaultRootWindow(display);
@@ -66,6 +75,7 @@ int main() {
 	grab_key_from_string(RESIZE_WINDOW_KEY, MODIFIER);
 
 	XEvent e;
+	XSetErrorHandler(error_handler);
 	while (1) {
 		XNextEvent(display, &e);
 		switch (e.type) {
@@ -98,7 +108,6 @@ int main() {
 				} else if (keycode == kill_client_kcode) {
 					if (focused_client != NULL) {
 						XDestroyWindow(display, focused_client->frame);
-						focused_client = NULL;
 					}
 				}
 
@@ -147,7 +156,6 @@ int main() {
 		}
 		case ButtonPress: {
 			Window win = e.xbutton.subwindow;
-			printf("win: 0x%lu\n", win);
 			for (client_t *it = client_head; it != NULL; it = it->next) {
 				if (it->frame == win && win != root) {
 					focused_client = it;
@@ -156,9 +164,24 @@ int main() {
 
 			XAllowEvents(display, ReplayPointer, CurrentTime);
 		}
+		case DestroyNotify: {
+			Window win = e.xdestroywindow.window;
+			if (focused_client != NULL && focused_client->frame == win) {
+				focused_client = NULL;
+				move_window = false;
+				resize_window = false;
+			}
+			break;
+		}
 		}
 
 		on_window_focus(display, focused_client, move_window, resize_window);
+		for (client_t *it = client_head; it != NULL; it = it->next) {
+			if (focused_client == NULL || it->frame != focused_client->frame) {
+				XSetWindowBorder(display, it->frame, WhitePixel(display, 0));
+			}
+		}
+
 		XSync(display, 0);
 	}
 	return 0;
