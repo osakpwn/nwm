@@ -1,1 +1,1 @@
-exec ./main
+exec ./nwm

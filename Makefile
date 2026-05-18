@@ -1,7 +1,7 @@
 TARGET=main.c client.c 
 FLAGS=-Wall -pedantic 
 LIBS=-lX11
-OUTPUT=main
+OUTPUT=nwm
 
 build: $(MAIN)
 	$(CC) -o $(OUTPUT) $(TARGET) $(LIBS) $(FLAGS)
