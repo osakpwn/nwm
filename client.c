@@ -3,6 +3,15 @@
 #include <X11/Xlib.h>
 #include <stdlib.h>
 
+client_t *find_client_using_window(client_t **client_head, Window win) {
+	for (client_t *it = *client_head; it != NULL; it = it->next) {
+		if (it->win == win)
+			return it;
+	}
+
+	return NULL;
+}
+
 void add_window_to_list(client_t **client_head, client_t *c) {
 	c->next = *client_head;
 	*client_head = c;

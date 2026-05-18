@@ -18,6 +18,7 @@ typedef struct client_t {
 } client_t;
 
 XWindowAttributes get_window_attr(Display *display, Window *win);
+client_t *find_client_using_window(client_t **client_head, Window win);
 void add_window_to_list(client_t **client_head, client_t *c);
 void remove_window_from_list(client_t **client_head, client_t *c);
 void on_window_focus(Display *display, client_t *client_focused,
