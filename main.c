@@ -30,6 +30,8 @@ client_t *client_head = NULL;
 client_t *focused_client = NULL;
 bool move_window = false;
 bool resize_window = false;
+int screen_width = 0;
+int screen_height = 0;
 
 KeyCode gen_key_code_from_string(const char *k) {
 	KeySym ksym = XStringToKeysym(k);
@@ -54,6 +56,9 @@ int main() {
 	display = XOpenDisplay(NULL);
 	root = XDefaultRootWindow(display);
 	Cursor cursor = XCreateFontCursor(display, XC_left_ptr);
+
+	screen_width = XDisplayWidth(display, DefaultScreen(display));
+	screen_height = XDisplayHeight(display, DefaultScreen(display));
 
 	XClearWindow(display, root);
 	XSelectInput(display, root,
@@ -126,12 +131,16 @@ int main() {
 							if (focused_client->x > 0)
 								focused_client->x -= MOVE_VEL;
 						} else if (keycode == right_kcode) {
-							focused_client->x += MOVE_VEL;
+							if (focused_client->x <
+								screen_width - focused_client->width - 8)
+								focused_client->x += MOVE_VEL;
 						} else if (keycode == up_kcode) {
 							if (focused_client->y > 0)
 								focused_client->y -= MOVE_VEL;
 						} else if (keycode == down_kcode) {
-							focused_client->y += MOVE_VEL;
+							if (focused_client->y <
+								screen_height - focused_client->height - 8)
+								focused_client->y += MOVE_VEL;
 						}
 
 						resize_window = false;
@@ -141,11 +150,17 @@ int main() {
 						if (keycode == left_kcode) {
 							focused_client->width -= RESIZE_VEL;
 						} else if (keycode == right_kcode) {
-							focused_client->width += RESIZE_VEL;
+							if (focused_client->x <
+								screen_width - focused_client->width - 8)
+
+								focused_client->width += RESIZE_VEL;
 						} else if (keycode == up_kcode) {
 							focused_client->height -= RESIZE_VEL;
 						} else if (keycode == down_kcode) {
-							focused_client->height += RESIZE_VEL;
+							if (focused_client->y <
+								screen_height - focused_client->height - 8)
+
+								focused_client->height += RESIZE_VEL;
 						}
 
 						move_window = false;
@@ -171,6 +186,15 @@ int main() {
 				focused_client = NULL;
 				move_window = false;
 				resize_window = false;
+			}
+
+			for (client_t *c = client_head; c != NULL; c = c->next) {
+				if (win == c->win) {
+					XDestroyWindow(display, c->frame);
+					remove_window_from_list(
+						&client_head,
+						find_client_using_window(&client_head, win));
+				}
 			}
 			break;
 		}
