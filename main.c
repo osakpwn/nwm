@@ -132,7 +132,7 @@ int main() {
 								focused_client->x -= MOVE_VEL;
 						} else if (keycode == right_kcode) {
 							if (focused_client->x <
-								screen_width - focused_client->width - 8)
+								screen_width - focused_client->width - 7)
 								focused_client->x += MOVE_VEL;
 						} else if (keycode == up_kcode) {
 							if (focused_client->y > 0)
@@ -151,7 +151,7 @@ int main() {
 							focused_client->width -= RESIZE_VEL;
 						} else if (keycode == right_kcode) {
 							if (focused_client->x <
-								screen_width - focused_client->width - 8)
+								screen_width - focused_client->width - 7)
 
 								focused_client->width += RESIZE_VEL;
 						} else if (keycode == up_kcode) {
