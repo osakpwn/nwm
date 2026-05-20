@@ -133,10 +133,26 @@ int main() {
 
 				if (focused_client != NULL) {
 					if (keycode == full_screen_kcode) {
-						focused_client->width = screen_width - 13;
-						focused_client->height = screen_height - 13;
-						focused_client->x = 4;
-						focused_client->y = 4;
+						focused_client->is_fullscreen =
+							!focused_client->is_fullscreen;
+						if (focused_client->is_fullscreen) {
+							focused_client->prev_width = focused_client->width;
+							focused_client->prev_height =
+								focused_client->height;
+							focused_client->prev_x = focused_client->x;
+							focused_client->prev_y = focused_client->y;
+
+							focused_client->width = screen_width - 13;
+							focused_client->height = screen_height - 13;
+							focused_client->x = 4;
+							focused_client->y = 4;
+						} else {
+							focused_client->width = focused_client->prev_width;
+							focused_client->height =
+								focused_client->prev_height;
+							focused_client->x = focused_client->prev_x;
+							focused_client->y = focused_client->prev_y;
+						}
 					}
 
 					if (move_window) {

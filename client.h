@@ -12,6 +12,9 @@
 typedef struct client_t {
 	Window win;
 	Window frame;
+	bool is_fullscreen;
+	int prev_width, prev_height;
+	int prev_x, prev_y;
 	int x, y;
 	int width, height;
 	struct client_t *next;
