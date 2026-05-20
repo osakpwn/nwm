@@ -1,6 +1,7 @@
 #include "client.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 client_t *find_client_using_window(client_t **client_head, Window win) {
@@ -82,6 +83,9 @@ void map_window(Display *display, Window *root, client_t **client_head,
 	c->y = win_attr.y;
 	c->width = win_attr.width;
 	c->height = win_attr.height;
+	c->is_fullscreen = false;
+	c->prev_width = c->width;
+	c->prev_height = c->height;
 
 	c->frame =
 		XCreateSimpleWindow(display, *root, c->x, c->y, c->width + 2, c->height,

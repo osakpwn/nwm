@@ -118,6 +118,7 @@ int main() {
 					system(APP_LAUNCHER);
 				} else if (keycode == kill_client_kcode) {
 					if (focused_client != NULL) {
+						XDestroyWindow(display, focused_client->win);
 						XDestroyWindow(display, focused_client->frame);
 					}
 				}
