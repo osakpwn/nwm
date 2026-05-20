@@ -24,6 +24,8 @@
 #define MOVE_WINDOW_KEY "m"
 #define RESIZE_WINDOW_KEY "r"
 
+#define FULL_SCREEN_KEY "f"
+
 Display *display;
 Window root;
 client_t *client_head = NULL;
@@ -78,6 +80,7 @@ int main() {
 	grab_key_from_string(DOWN_KEY, MODIFIER);
 	grab_key_from_string(MOVE_WINDOW_KEY, MODIFIER);
 	grab_key_from_string(RESIZE_WINDOW_KEY, MODIFIER);
+	grab_key_from_string(FULL_SCREEN_KEY, MODIFIER);
 
 	XEvent e;
 	XSetErrorHandler(error_handler);
@@ -105,6 +108,9 @@ int main() {
 			KeyCode move_kcode = gen_key_code_from_string(MOVE_WINDOW_KEY);
 			KeyCode resize_kcode = gen_key_code_from_string(RESIZE_WINDOW_KEY);
 
+			KeyCode full_screen_kcode =
+				gen_key_code_from_string(FULL_SCREEN_KEY);
+
 			if (state & MODIFIER) {
 				if (keycode == quit_kcode) {
 					exit(0);
@@ -126,6 +132,13 @@ int main() {
 				}
 
 				if (focused_client != NULL) {
+					if (keycode == full_screen_kcode) {
+						focused_client->width = screen_width - 13;
+						focused_client->height = screen_height - 13;
+						focused_client->x = 4;
+						focused_client->y = 4;
+					}
+
 					if (move_window) {
 						if (keycode == left_kcode) {
 							if (focused_client->x > 0)
