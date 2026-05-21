@@ -55,10 +55,10 @@ void on_window_focus(Display *display, client_t **client_head,
 		XMoveWindow(display, focused_client->frame, focused_client->x,
 					focused_client->y);
 
-		XResizeWindow(display, focused_client->frame, focused_client->width,
+		XResizeWindow(display, focused_client->win, focused_client->width,
 					  focused_client->height);
 
-		XResizeWindow(display, focused_client->win, focused_client->width,
+		XResizeWindow(display, focused_client->frame, focused_client->width,
 					  focused_client->height);
 
 		if (move_window) {
