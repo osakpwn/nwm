@@ -2,29 +2,28 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
+#include <X11/keysym.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #define MODIFIER Mod4Mask
 #define APP_LAUNCHER "dmenu_run"
-#define EXIT_WM_KEY                                                            \
-	"q" // this translates to MODIFIER + q and the same applies to all _KEY
-		// definitions
-#define CLOSE_APP_KEY "c"
-#define OPEN_APP_LAUNCHER_KEY "space"
-#define LEFT_KEY "Left"
-#define RIGHT_KEY "Right"
-#define UP_KEY "Up"
-#define DOWN_KEY "Down"
+#define EXIT_WM_KEY XK_q
+#define CLOSE_APP_KEY XK_c
+#define OPEN_APP_LAUNCHER_KEY XK_space
+#define LEFT_KEY XK_Left
+#define RIGHT_KEY XK_Right
+#define UP_KEY XK_Up
+#define DOWN_KEY XK_Down
 
 #define MOVE_VEL 10
 #define RESIZE_VEL 10
 
-#define MOVE_WINDOW_KEY "m"
-#define RESIZE_WINDOW_KEY "r"
+#define MOVE_WINDOW_KEY XK_m
+#define RESIZE_WINDOW_KEY XK_r
 
-#define FULL_SCREEN_KEY "f"
+#define FULL_SCREEN_KEY XK_f
 
 Display *display;
 Window root;
@@ -35,14 +34,9 @@ bool resize_window = false;
 int screen_width = 0;
 int screen_height = 0;
 
-KeyCode gen_key_code_from_string(const char *k) {
-	KeySym ksym = XStringToKeysym(k);
-	return XKeysymToKeycode(display, ksym);
-}
-
-void grab_key_from_string(const char *k, unsigned int mod) {
-	KeyCode kcode = gen_key_code_from_string(k);
-	XGrabKey(display, kcode, mod, root, True, GrabModeAsync, GrabModeAsync);
+void grab_key_from_keysym(KeySym k, unsigned int mod) {
+	XGrabKey(display, XKeysymToKeycode(display, k), mod, root, True,
+			 GrabModeAsync, GrabModeAsync);
 }
 
 int error_handler(Display *d, XErrorEvent *ee) {
@@ -71,16 +65,17 @@ int main() {
 	XGrabButton(display, Button1, 0, root, False, ButtonPressMask, GrabModeSync,
 				GrabModeAsync, root, cursor);
 
-	grab_key_from_string(EXIT_WM_KEY, MODIFIER);
-	grab_key_from_string(OPEN_APP_LAUNCHER_KEY, MODIFIER);
-	grab_key_from_string(CLOSE_APP_KEY, MODIFIER);
-	grab_key_from_string(LEFT_KEY, MODIFIER);
-	grab_key_from_string(RIGHT_KEY, MODIFIER);
-	grab_key_from_string(UP_KEY, MODIFIER);
-	grab_key_from_string(DOWN_KEY, MODIFIER);
-	grab_key_from_string(MOVE_WINDOW_KEY, MODIFIER);
-	grab_key_from_string(RESIZE_WINDOW_KEY, MODIFIER);
-	grab_key_from_string(FULL_SCREEN_KEY, MODIFIER);
+	grab_key_from_keysym(EXIT_WM_KEY, MODIFIER);
+	grab_key_from_keysym(OPEN_APP_LAUNCHER_KEY, MODIFIER);
+	grab_key_from_keysym(CLOSE_APP_KEY, MODIFIER);
+	grab_key_from_keysym(CLOSE_APP_KEY, MODIFIER | ShiftMask);
+	grab_key_from_keysym(LEFT_KEY, MODIFIER);
+	grab_key_from_keysym(RIGHT_KEY, MODIFIER);
+	grab_key_from_keysym(UP_KEY, MODIFIER);
+	grab_key_from_keysym(DOWN_KEY, MODIFIER);
+	grab_key_from_keysym(MOVE_WINDOW_KEY, MODIFIER);
+	grab_key_from_keysym(RESIZE_WINDOW_KEY, MODIFIER);
+	grab_key_from_keysym(FULL_SCREEN_KEY, MODIFIER);
 
 	XEvent e;
 	XSetErrorHandler(error_handler);
@@ -93,47 +88,31 @@ int main() {
 			break;
 		}
 		case KeyPress: {
-			KeyCode keycode = e.xkey.keycode;
+			KeySym ksym = XLookupKeysym(&e.xkey, 0);
 			unsigned int state = e.xkey.state;
-			KeyCode quit_kcode = gen_key_code_from_string(EXIT_WM_KEY);
-			KeyCode launcher_kcode =
-				gen_key_code_from_string(OPEN_APP_LAUNCHER_KEY);
-			KeyCode kill_client_kcode = gen_key_code_from_string(CLOSE_APP_KEY);
-
-			KeyCode left_kcode = gen_key_code_from_string(LEFT_KEY);
-			KeyCode right_kcode = gen_key_code_from_string(RIGHT_KEY);
-			KeyCode up_kcode = gen_key_code_from_string(UP_KEY);
-			KeyCode down_kcode = gen_key_code_from_string(DOWN_KEY);
-
-			KeyCode move_kcode = gen_key_code_from_string(MOVE_WINDOW_KEY);
-			KeyCode resize_kcode = gen_key_code_from_string(RESIZE_WINDOW_KEY);
-
-			KeyCode full_screen_kcode =
-				gen_key_code_from_string(FULL_SCREEN_KEY);
-
 			if (state & MODIFIER) {
-				if (keycode == quit_kcode) {
+				if (ksym == EXIT_WM_KEY) {
 					exit(0);
-				} else if (keycode == launcher_kcode) {
+				} else if (ksym == OPEN_APP_LAUNCHER_KEY) {
 					system(APP_LAUNCHER);
-				} else if (keycode == kill_client_kcode) {
+				} else if (ksym == CLOSE_APP_KEY) {
 					if (focused_client != NULL) {
 						XDestroyWindow(display, focused_client->win);
 						XDestroyWindow(display, focused_client->frame);
 					}
 				}
 
-				if (keycode == move_kcode) {
+				if (ksym == MOVE_WINDOW_KEY) {
 					move_window = !move_window;
 					resize_window = false;
 				}
-				if (keycode == resize_kcode) {
+				if (ksym == RESIZE_WINDOW_KEY) {
 					resize_window = !resize_window;
 					move_window = false;
 				}
 
 				if (focused_client != NULL) {
-					if (keycode == full_screen_kcode) {
+					if (ksym == FULL_SCREEN_KEY) {
 						focused_client->is_fullscreen =
 							!focused_client->is_fullscreen;
 						if (focused_client->is_fullscreen) {
@@ -157,17 +136,17 @@ int main() {
 					}
 
 					if (move_window) {
-						if (keycode == left_kcode) {
+						if (ksym == LEFT_KEY) {
 							if (focused_client->x > 0)
 								focused_client->x -= MOVE_VEL;
-						} else if (keycode == right_kcode) {
+						} else if (ksym == RIGHT_KEY) {
 							if (focused_client->x <
 								screen_width - focused_client->width - 7)
 								focused_client->x += MOVE_VEL;
-						} else if (keycode == up_kcode) {
+						} else if (ksym == UP_KEY) {
 							if (focused_client->y > 0)
 								focused_client->y -= MOVE_VEL;
-						} else if (keycode == down_kcode) {
+						} else if (ksym == DOWN_KEY) {
 							if (focused_client->y <
 								screen_height - focused_client->height - 8)
 								focused_client->y += MOVE_VEL;
@@ -177,16 +156,16 @@ int main() {
 					}
 
 					if (resize_window) {
-						if (keycode == left_kcode) {
+						if (ksym == LEFT_KEY) {
 							focused_client->width -= RESIZE_VEL;
-						} else if (keycode == right_kcode) {
+						} else if (ksym == RIGHT_KEY) {
 							if (focused_client->x <
 								screen_width - focused_client->width - 7)
 
 								focused_client->width += RESIZE_VEL;
-						} else if (keycode == up_kcode) {
+						} else if (ksym == UP_KEY) {
 							focused_client->height -= RESIZE_VEL;
-						} else if (keycode == down_kcode) {
+						} else if (ksym == DOWN_KEY) {
 							if (focused_client->y <
 								screen_height - focused_client->height - 8)
 
@@ -224,6 +203,11 @@ int main() {
 					remove_window_from_list(
 						&client_head,
 						find_client_using_window(&client_head, win));
+				}
+
+				if (win == c->frame) {
+					XDestroyWindow(display, c->win);
+					remove_window_from_list(&client_head, c);
 				}
 			}
 			break;
