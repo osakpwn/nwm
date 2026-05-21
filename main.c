@@ -1,4 +1,5 @@
 #include "client.h"
+#include "keys.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
@@ -7,16 +8,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MODIFIER Mod4Mask
+#define MODIFIER MOD4_KEY
 #define APP_LAUNCHER "dmenu_run"
 #define EXIT_WM_KEY XK_q
 #define CLOSE_APP_KEY XK_c
 #define OPEN_APP_LAUNCHER_KEY XK_space
-#define LEFT_KEY XK_Left
-#define RIGHT_KEY XK_Right
-#define UP_KEY XK_Up
-#define DOWN_KEY XK_Down
-
 #define MOVE_VEL 10
 #define RESIZE_VEL 10
 
@@ -176,6 +172,9 @@ int main() {
 					}
 				}
 			}
+
+			on_window_focus(display, &client_head, focused_client, move_window,
+							resize_window);
 			break;
 		}
 		case ButtonPress: {
@@ -185,8 +184,9 @@ int main() {
 					focused_client = it;
 				}
 			}
-
 			XAllowEvents(display, ReplayPointer, CurrentTime);
+			on_window_focus(display, &client_head, focused_client, move_window,
+							resize_window);
 		}
 		case DestroyNotify: {
 			Window win = e.xdestroywindow.window;
@@ -225,30 +225,20 @@ int main() {
 			};
 			XConfigureWindow(display, ev->window, ev->value_mask, &changes);
 
-			XConfigureEvent ce = {
-				.type = ConfigureNotify,
-				.display = display,
-				.event = ev->window,
-				.window = ev->window,
-				.x = ev->x,
-				.y = ev->y,
-				.width = ev->width,
-				.height = ev->height,
-				.border_width = ev->border_width,
-				.above = None,
-				.override_redirect = False,
-			};
+			XConfigureEvent ce = {.type = ConfigureNotify,
+								  .display = display,
+								  .event = ev->window,
+								  .window = ev->window,
+								  .x = ev->x,
+								  .y = ev->y,
+								  .width = ev->width,
+								  .height = ev->height,
+								  .border_width = ev->border_width,
+								  .above = None};
 			XSendEvent(display, ev->window, False, StructureNotifyMask,
 					   (XEvent *)&ce);
 			break;
 		}
-		}
-
-		on_window_focus(display, focused_client, move_window, resize_window);
-		for (client_t *it = client_head; it != NULL; it = it->next) {
-			if (focused_client == NULL || it->frame != focused_client->frame) {
-				XSetWindowBorder(display, it->frame, WhitePixel(display, 0));
-			}
 		}
 
 		XSync(display, 0);

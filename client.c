@@ -45,8 +45,9 @@ XWindowAttributes get_window_attr(Display *display, Window *win) {
 	return xc;
 }
 
-void on_window_focus(Display *display, client_t *focused_client,
-					 bool move_window, bool resize_window) {
+void on_window_focus(Display *display, client_t **client_head,
+					 client_t *focused_client, bool move_window,
+					 bool resize_window) {
 	if (focused_client != NULL) {
 		XSetInputFocus(display, focused_client->win, RevertToPointerRoot,
 					   CurrentTime);
@@ -66,6 +67,12 @@ void on_window_focus(Display *display, client_t *focused_client,
 			XSetWindowBorder(display, focused_client->frame, COLOR_GREEN);
 		} else {
 			XSetWindowBorder(display, focused_client->frame, COLOR_BLUE);
+		}
+	}
+
+	for (client_t *it = *client_head; it != NULL; it = it->next) {
+		if (focused_client == NULL || it->frame != focused_client->frame) {
+			XSetWindowBorder(display, it->frame, WhitePixel(display, 0));
 		}
 	}
 }
@@ -96,7 +103,7 @@ void map_window(Display *display, Window *root, client_t **client_head,
 					 ButtonReleaseMask);
 
 	XReparentWindow(display, c->win, c->frame, 0, 0);
-	XMapWindow(display, c->frame);
 	XMapWindow(display, c->win);
+	XMapWindow(display, c->frame);
 	*focused_client = c;
 }
