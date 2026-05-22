@@ -4,9 +4,11 @@
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
+#include <bits/time.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define MODIFIER MOD4_KEY
 #define APP_LAUNCHER "dmenu_run"
@@ -44,8 +46,23 @@ int error_handler(Display *d, XErrorEvent *ee) {
 	return 0;
 }
 
+void request_window_close(Window win) {
+	Atom wm_delete = XInternAtom(display, "WM_DELETE_WINDOW", False);
+	Atom wm_protocols = XInternAtom(display, "WM_PROTOCOLS", False);
+
+	XEvent ev = {0};
+
+	ev.xclient.type = ClientMessage;
+	ev.xclient.window = win;
+	ev.xclient.message_type = wm_protocols;
+	ev.xclient.format = 32;
+	ev.xclient.data.l[0] = wm_delete;
+	ev.xclient.data.l[1] = CurrentTime;
+
+	XSendEvent(display, win, False, NoEventMask, &ev);
+}
+
 int main() {
-	destroyed_winbuf dest_winbuf = init_destroyed_winbuf();
 	display = XOpenDisplay(NULL);
 	root = XDefaultRootWindow(display);
 	Cursor cursor = XCreateFontCursor(display, XC_left_ptr);
@@ -94,8 +111,13 @@ int main() {
 					system(APP_LAUNCHER);
 				} else if (ksym == CLOSE_APP_KEY) {
 					if (focused_client != NULL) {
-						XKillClient(display, focused_client->win);
-						XDestroyWindow(display, focused_client->frame);
+						// XKillClient(display, focused_client->win);
+						// XDestroyWindow(display, focused_client->frame);
+						request_window_close(focused_client->win);
+						focused_client->window_close_request_sent = true;
+						clock_gettime(
+							CLOCK_MONOTONIC,
+							&focused_client->time_window_close_request_sent);
 					}
 				}
 
@@ -242,6 +264,7 @@ int main() {
 		}
 		}
 
+		client_cleanup_loop(display, &client_head);
 		XSync(display, 0);
 	}
 	return 0;

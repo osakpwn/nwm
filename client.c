@@ -96,6 +96,7 @@ void map_window(Display *display, Window *root, client_t **client_head,
 	c->is_fullscreen = false;
 	c->prev_width = c->width;
 	c->prev_height = c->height;
+	c->window_close_request_sent = false;
 
 	XSelectInput(display, c->win,
 				 EnterWindowMask | LeaveWindowMask | PropertyChangeMask |
@@ -130,4 +131,22 @@ void append_to_destroyed_winbuf(destroyed_winbuf *winbuf, Window win) {
 	}
 	winbuf->windows[winbuf->pos] = win;
 	winbuf->pos++;
+}
+
+long elapsed_ms(struct timespec a) {
+	struct timespec now;
+	clock_gettime(CLOCK_MONOTONIC, &now);
+
+	return (now.tv_sec - a.tv_sec) * 1000L +
+		   (now.tv_nsec - a.tv_nsec) / 1000000L;
+}
+void client_cleanup_loop(Display *display, client_t **client_head) {
+	for (client_t *it = *client_head; it != NULL; it = it->next) {
+		if (it->window_close_request_sent &&
+			elapsed_ms(it->time_window_close_request_sent) > 2000) {
+			XKillClient(display, it->win);
+			XDestroyWindow(display, it->frame);
+			remove_window_from_list(client_head, it);
+		}
+	}
 }

@@ -4,6 +4,7 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define COLOR_BLUE 0x5E85BF // somewhat blue afterall
 #define COLOR_RED 0xC91400
@@ -18,6 +19,8 @@ typedef struct client_t {
 	int x, y;
 	int width, height;
 	struct client_t *next;
+	bool window_close_request_sent;
+	struct timespec time_window_close_request_sent;
 } client_t;
 
 typedef struct {
@@ -35,7 +38,5 @@ void on_window_focus(Display *display, client_t **client_head,
 					 bool resize_window);
 void map_window(Display *display, Window *root, client_t **client_head,
 				client_t **focused_client, XMapRequestEvent *mr);
-
-destroyed_winbuf init_destroyed_winbuf();
-void append_to_destroyed_winbuf(destroyed_winbuf *winbuf, Window win);
+void client_cleanup_loop(Display *display, client_t **client_head);
 #endif
