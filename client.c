@@ -94,6 +94,11 @@ void map_window(Display *display, Window *root, client_t **client_head,
 	c->prev_width = c->width;
 	c->prev_height = c->height;
 
+	XSelectInput(display, c->win,
+				 EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask |
+					 PropertyChangeMask);
+
+	XAddToSaveSet(display, c->win);
 	c->frame =
 		XCreateSimpleWindow(display, *root, c->x, c->y, c->width + 2, c->height,
 							2, WhitePixel(display, 0), BlackPixel(display, 0));
@@ -106,4 +111,20 @@ void map_window(Display *display, Window *root, client_t **client_head,
 	XMapWindow(display, c->win);
 	XMapWindow(display, c->frame);
 	*focused_client = c;
+}
+
+destroyed_winbuf init_destroyed_winbuf() {
+	int cap = 10;
+	Window *buf = malloc(cap * sizeof(Window));
+	return (destroyed_winbuf){buf, 0, cap};
+}
+
+void append_to_destroyed_winbuf(destroyed_winbuf *winbuf, Window win) {
+	if (winbuf->pos >= winbuf->cap) {
+		winbuf->cap += 10;
+		winbuf->windows =
+			realloc(winbuf->windows, winbuf->cap * sizeof(Window));
+	}
+	winbuf->windows[winbuf->pos] = win;
+	winbuf->pos++;
 }

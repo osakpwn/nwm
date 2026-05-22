@@ -20,6 +20,12 @@ typedef struct client_t {
 	struct client_t *next;
 } client_t;
 
+typedef struct {
+	Window *windows;
+	int pos;
+	int cap;
+} destroyed_winbuf;
+
 XWindowAttributes get_window_attr(Display *display, Window *win);
 client_t *find_client_using_window(client_t **client_head, Window win);
 void add_window_to_list(client_t **client_head, client_t *c);
@@ -30,4 +36,6 @@ void on_window_focus(Display *display, client_t **client_head,
 void map_window(Display *display, Window *root, client_t **client_head,
 				client_t **focused_client, XMapRequestEvent *mr);
 
+destroyed_winbuf init_destroyed_winbuf();
+void append_to_destroyed_winbuf(destroyed_winbuf *winbuf, Window win);
 #endif
