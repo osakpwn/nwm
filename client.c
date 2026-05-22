@@ -2,6 +2,7 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 client_t *find_client_using_window(client_t **client_head, Window win) {
@@ -81,8 +82,10 @@ void map_window(Display *display, Window *root, client_t **client_head,
 				client_t **focused_client, XMapRequestEvent *mr) {
 	XWindowAttributes win_attr = get_window_attr(display, &mr->window);
 
-	if (win_attr.override_redirect)
+	if (win_attr.override_redirect) {
+		printf("override redirect!\n");
 		return;
+	}
 
 	client_t *c = malloc(sizeof(client_t));
 	c->win = mr->window;
@@ -95,8 +98,8 @@ void map_window(Display *display, Window *root, client_t **client_head,
 	c->prev_height = c->height;
 
 	XSelectInput(display, c->win,
-				 EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask |
-					 PropertyChangeMask);
+				 EnterWindowMask | LeaveWindowMask | PropertyChangeMask |
+					 ExposureMask | StructureNotifyMask);
 
 	XAddToSaveSet(display, c->win);
 	c->frame =
