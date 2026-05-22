@@ -45,6 +45,7 @@ int error_handler(Display *d, XErrorEvent *ee) {
 }
 
 int main() {
+	destroyed_winbuf dest_winbuf = init_destroyed_winbuf();
 	display = XOpenDisplay(NULL);
 	root = XDefaultRootWindow(display);
 	Cursor cursor = XCreateFontCursor(display, XC_left_ptr);
@@ -93,7 +94,7 @@ int main() {
 					system(APP_LAUNCHER);
 				} else if (ksym == CLOSE_APP_KEY) {
 					if (focused_client != NULL) {
-						XDestroyWindow(display, focused_client->win);
+						XKillClient(display, focused_client->win);
 						XDestroyWindow(display, focused_client->frame);
 					}
 				}
