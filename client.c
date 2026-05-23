@@ -1,4 +1,5 @@
 #include "client.h"
+#include "utils.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <stdbool.h>
@@ -133,13 +134,6 @@ void append_to_destroyed_winbuf(destroyed_winbuf *winbuf, Window win) {
 	winbuf->pos++;
 }
 
-long elapsed_ms(struct timespec a) {
-	struct timespec now;
-	clock_gettime(CLOCK_MONOTONIC, &now);
-
-	return (now.tv_sec - a.tv_sec) * 1000L +
-		   (now.tv_nsec - a.tv_nsec) / 1000000L;
-}
 void client_cleanup_loop(Display *display, client_t **client_head) {
 	for (client_t *it = *client_head; it != NULL; it = it->next) {
 		if (it->window_close_request_sent &&
