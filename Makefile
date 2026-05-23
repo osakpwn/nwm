@@ -1,4 +1,4 @@
-TARGET=main.c client.c 
+TARGET=main.c client.c notification.c utils.c 
 FLAGS=-Wall -pedantic 
 LIBS=-lX11
 OUTPUT=nwm
