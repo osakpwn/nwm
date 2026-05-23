@@ -1,4 +1,4 @@
-TARGET=main.c client.c notification.c utils.c 
+TARGET= $(wildcard *.c)
 FLAGS=-Wall -pedantic 
 LIBS=-lX11
 OUTPUT=nwm
