@@ -1,5 +1,6 @@
 #include "client.h"
 #include "keys.h"
+#include "notification.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
@@ -22,11 +23,14 @@
 #define RESIZE_WINDOW_KEY XK_r
 
 #define FULL_SCREEN_KEY XK_f
+#define MINIMIZE_WINDOW_KEY XK_u
 
 Display *display;
 Window root;
 client_t *client_head = NULL;
 client_t *focused_client = NULL;
+client_t *minimized_client = NULL;
+notif_t *cur_notif = NULL;
 bool move_window = false;
 bool resize_window = false;
 int screen_width = 0;
@@ -90,6 +94,7 @@ int main() {
 	grab_key_from_keysym(MOVE_WINDOW_KEY, MODIFIER);
 	grab_key_from_keysym(RESIZE_WINDOW_KEY, MODIFIER);
 	grab_key_from_keysym(FULL_SCREEN_KEY, MODIFIER);
+	grab_key_from_keysym(MINIMIZE_WINDOW_KEY, MODIFIER);
 
 	XEvent e;
 	XSetErrorHandler(error_handler);
@@ -129,8 +134,26 @@ int main() {
 					resize_window = !resize_window;
 					move_window = false;
 				}
-
+				if (ksym == MINIMIZE_WINDOW_KEY) {
+					if (minimized_client != NULL) {
+						minimized_client->is_minimized = false;
+						focused_client = minimized_client;
+						minimized_client = NULL;
+						XMapWindow(display, focused_client->frame);
+					} else if (focused_client != NULL) {
+						if (!focused_client->is_minimized &&
+							minimized_client == NULL) {
+							focused_client->is_minimized = true;
+							resize_window = false;
+							move_window = false;
+							minimized_client = focused_client;
+							focused_client = NULL;
+							XUnmapWindow(display, minimized_client->frame);
+						}
+					}
+				}
 				if (focused_client != NULL) {
+
 					if (ksym == FULL_SCREEN_KEY) {
 						focused_client->is_fullscreen =
 							!focused_client->is_fullscreen;
@@ -265,6 +288,7 @@ int main() {
 		}
 
 		client_cleanup_loop(display, &client_head);
+		cleanup_notification_window(display, cur_notif);
 		XSync(display, 0);
 	}
 	return 0;

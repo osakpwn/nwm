@@ -21,6 +21,7 @@ typedef struct client_t {
 	struct client_t *next;
 	bool window_close_request_sent;
 	struct timespec time_window_close_request_sent;
+	bool is_minimized;
 } client_t;
 
 typedef struct {

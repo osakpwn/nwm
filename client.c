@@ -98,6 +98,7 @@ void map_window(Display *display, Window *root, client_t **client_head,
 	c->prev_width = c->width;
 	c->prev_height = c->height;
 	c->window_close_request_sent = false;
+	c->is_minimized = false;
 
 	XSelectInput(display, c->win,
 				 EnterWindowMask | LeaveWindowMask | PropertyChangeMask |
