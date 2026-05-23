@@ -37,12 +37,15 @@ make build && make run
 
 ## Default key bindings 
 
-- Mod + Q = Exit window manager
+- Mod + q = Exit window manager
 - Mod + Space = Open application launcher (dmenu by default but can be changed in `config.h`)
-- Mod + R to toggle `resize mode`. When in resize mode, use arrow keys to resize window 
-- Mod + M to toggle `move mode`. When in move mode, use arrow keys to move window 
-- Mod + C to destroy an active window 
-- Mod + F to toggle fullscreen mode
+- Mod + r to toggle `resize mode`. When in resize mode, use arrow keys to resize window 
+- Mod + m to toggle `move mode`. When in move mode, use arrow keys to move window 
+- Mod + c to destroy an active window 
+
+## Other key bindings 
+- Mod + f to toggle fullscreen
+- Mod + u to hide/show window
 
 ## Window colour modes
 Window borders have different colours based on input mode 
