@@ -1,6 +1,6 @@
 TARGET= $(wildcard *.c)
 FLAGS=-Wall -pedantic 
-LIBS=-lX11
+LIBS=-lX11 -lpthread
 OUTPUT=nwm
 
 build: $(MAIN)
