@@ -8,7 +8,7 @@
 
 void *new_socket_session() 
 {
-	char *addr_str = "nwm.sock";
+	char *addr_str = "../nwm.sock";
 	int fd = socket(AF_UNIX, SOCK_STREAM, 0);	
 	struct sockaddr_un addr;
 	addr.sun_family = AF_UNIX;
