@@ -73,6 +73,10 @@ class Cli {
 
 		std::string get_option(std::string arg)
 		{
+			for (auto option: options)
+			{
+				if (option.title == arg) return option.value;
+			}
 			return "";	 	
 		}
 
