@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <pthread.h>
+#include "ipc.h"
 
 #define MODIFIER MOD4_KEY
 #define APP_LAUNCHER "dmenu_run"
@@ -95,6 +97,11 @@ int main() {
 	grab_key_from_keysym(RESIZE_WINDOW_KEY, MODIFIER);
 	grab_key_from_keysym(FULL_SCREEN_KEY, MODIFIER);
 	grab_key_from_keysym(MINIMIZE_WINDOW_KEY, MODIFIER);
+
+
+	pthread_t thread;
+	pthread_create(&thread, NULL, new_socket_session, NULL);
+
 
 	XEvent e;
 	XSetErrorHandler(error_handler);
