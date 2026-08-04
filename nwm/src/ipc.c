@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include "ipc.h"
+#include "../include/ipc.h"
 
 void *new_socket_session() 
 {

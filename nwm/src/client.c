@@ -1,5 +1,5 @@
-#include "client.h"
-#include "utils.h"
+#include "../include/client.h"
+#include "../include/utils.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <stdbool.h>

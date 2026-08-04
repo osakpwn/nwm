@@ -1,4 +1,4 @@
-TARGET= $(wildcard *.c)
+TARGET= $(wildcard src/*.c)
 FLAGS=-Wall -pedantic 
 LIBS=-lX11 -lpthread
 OUTPUT=nwm

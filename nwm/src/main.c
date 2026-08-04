@@ -1,6 +1,6 @@
-#include "client.h"
-#include "keys.h"
-#include "notification.h"
+#include "../include/client.h"
+#include "../include/keys.h"
+#include "../include/notification.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
-#include "ipc.h"
+#include "../include/ipc.h"
 
 #define MODIFIER MOD4_KEY
 #define APP_LAUNCHER "dmenu_run"

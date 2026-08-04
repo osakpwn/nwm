@@ -1,5 +1,5 @@
-#include "notification.h"
-#include "utils.h"
+#include "../include/notification.h"
+#include "../include/utils.h"
 #include <X11/Xlib.h>
 #include <bits/time.h>
 #include <stdlib.h>
