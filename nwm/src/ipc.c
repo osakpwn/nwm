@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <unistd.h>
 
 #include "../include/ipc.h"
 
@@ -18,6 +19,8 @@ void *new_socket_session()
 	if (code < 0) 
 	{
 		printf("unable to bind socket!\n");
+		unlink(addr_str);
+		close(fd);
 		return 0;
 	}
 
@@ -25,6 +28,8 @@ void *new_socket_session()
 	if (code < 0) 
 	{
 		printf("unable to listen!\n");
+		unlink(addr_str);
+		close(fd);
 		return 0;
 	}
 
@@ -38,9 +43,11 @@ void *new_socket_session()
 		printf("res: %s\n", buf);
 
 
-		if (strcmp(buf, "exit\n") == 0) 
+		if (strcmp(buf, "exit") == 0) 
 		{
 			printf("received exit signal...\n");
+			unlink(addr_str);
+			close(fd);
 			exit(0);
 		}
 		memset(buf, 0, sizeof(buf));
