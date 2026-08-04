@@ -8,6 +8,16 @@
 
 int main (int argc, char **argv)
 {
+	auto cli = Cli(argc, argv, "nctl", "Command line utility for configuring nwm");
+	cli.add_option("-h", "Display help", true);
+
+	if (cli.is_command("-h")) 
+	{
+		cli.print_help();
+		return 0;
+	}
+
+
 	std::string addr_str = "../nwm.sock";
 	struct sockaddr_un server_addr;
 	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
