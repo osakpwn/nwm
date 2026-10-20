@@ -37,6 +37,9 @@ bool move_window = false;
 bool resize_window = false;
 int screen_width = 0;
 int screen_height = 0;
+int dragging = 0;
+int initial_mouse_x = 0, initial_mouse_y = 0;
+int initial_win_x = 0, initial_win_y = 0;
 
 void grab_key_from_keysym(KeySym k, unsigned int mod) {
 	XGrabKey(display, XKeysymToKeycode(display, k), mod, root, True,
@@ -99,8 +102,10 @@ int main() {
 	grab_key_from_keysym(MINIMIZE_WINDOW_KEY, MODIFIER);
 
 
+	struct Inst_Set inst_set;
+
 	pthread_t thread;
-	pthread_create(&thread, NULL, new_socket_session, NULL);
+	pthread_create(&thread, NULL, new_socket_session, (void *) &inst_set);
 
 
 	XEvent e;
@@ -240,7 +245,24 @@ int main() {
 			XAllowEvents(display, ReplayPointer, CurrentTime);
 			on_window_focus(display, &client_head, focused_client, move_window,
 							resize_window);
+
+
+			if (focused_client != NULL) 
+			{
+				XWindowAttributes attr; 
+				XGetWindowAttributes(display, focused_client->win, &attr);
+				focused_client->prev_x = attr.x; 
+				focused_client->prev_y = attr.y; 
+			}
+		
+			break;
 		}
+		case MotionNotify: {
+			break;
+		}
+
+		case ButtonRelease:
+			break;
 		case DestroyNotify: {
 			Window win = e.xdestroywindow.window;
 			if (focused_client != NULL && focused_client->frame == win) {
