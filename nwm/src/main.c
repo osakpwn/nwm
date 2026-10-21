@@ -41,6 +41,17 @@ int dragging = 0;
 int initial_mouse_x = 0, initial_mouse_y = 0;
 int initial_win_x = 0, initial_win_y = 0;
 
+
+
+client_t *get_client_head ()
+{
+	return client_head;
+}
+void set_client_head (client_t *ch)
+{
+	client_head = ch;
+}
+
 void grab_key_from_keysym(KeySym k, unsigned int mod) {
 	XGrabKey(display, XKeysymToKeycode(display, k), mod, root, True,
 			 GrabModeAsync, GrabModeAsync);
@@ -130,7 +141,7 @@ int main() {
 	XGrabButton(display, Button1, 0, root, False, ButtonPressMask, GrabModeSync,
 				GrabModeAsync, root, cursor);
 
-	grab_key_from_keysym(EXIT_WM_KEY, MODIFIER);
+	grab_key_from_keysym(EXIT_WM_KEY, MODIFIER | ShiftMask);
 	grab_key_from_keysym(OPEN_APP_LAUNCHER_KEY, MODIFIER);
 	grab_key_from_keysym(CLOSE_APP_KEY, MODIFIER);
 	grab_key_from_keysym(CLOSE_APP_KEY, MODIFIER | ShiftMask);
@@ -154,10 +165,8 @@ int main() {
 	grab_key_from_keysym(WORKSPACE_9_KEY, MODIFIER);
 
 
-	struct Inst_Set inst_set;
-
 	pthread_t thread;
-	pthread_create(&thread, NULL, new_socket_session, (void *) &inst_set);
+	pthread_create(&thread, NULL, new_socket_session, NULL);
 
 
 	XEvent e;
@@ -173,11 +182,14 @@ int main() {
 		case KeyPress: {
 			KeySym ksym = XLookupKeysym(&e.xkey, 0);
 			unsigned int state = e.xkey.state;
+
+
+			if (ksym == EXIT_WM_KEY) {
+					exit(0);
+				}
 			if (state & MODIFIER) {
 				handle_workspace_switching_keys (ksym);
-				if (ksym == EXIT_WM_KEY) {
-					exit(0);
-				} else if (ksym == OPEN_APP_LAUNCHER_KEY) {
+				 if (ksym == OPEN_APP_LAUNCHER_KEY) {
 					system(APP_LAUNCHER);
 				} else if (ksym == CLOSE_APP_KEY) {
 					if (focused_client != NULL) {
