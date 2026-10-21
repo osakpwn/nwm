@@ -22,6 +22,7 @@ typedef struct client_t {
 	bool window_close_request_sent;
 	struct timespec time_window_close_request_sent;
 	bool is_minimized;
+	int workspace_id;
 } client_t;
 
 typedef struct {
@@ -40,4 +41,7 @@ void on_window_focus(Display *display, client_t **client_head,
 void map_window(Display *display, Window *root, client_t **client_head,
 				client_t **focused_client, XMapRequestEvent *mr);
 void client_cleanup_loop(Display *display, client_t **client_head);
+
+void switch_to_workspace (Display *display, client_t **client_head, int id);
+int get_current_workspace ();
 #endif

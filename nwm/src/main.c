@@ -71,6 +71,48 @@ void request_window_close(Window win) {
 	XSendEvent(display, win, False, NoEventMask, &ev);
 }
 
+
+void handle_workspace_switching_keys (KeySym ksym)
+{
+	switch (ksym) 
+	{
+		case WORKSPACE_1_KEY: 
+			switch_to_workspace(display,& client_head, 1);
+			break;
+		case WORKSPACE_2_KEY: 
+			switch_to_workspace(display,& client_head, 2);
+			break;
+
+		case WORKSPACE_3_KEY: 
+			switch_to_workspace(display,& client_head, 3);
+			break;
+
+		case WORKSPACE_4_KEY: 
+			switch_to_workspace(display,& client_head, 4);
+			break;
+		case WORKSPACE_5_KEY: 
+			switch_to_workspace(display,& client_head, 5);
+			break;
+
+		case WORKSPACE_6_KEY: 
+			switch_to_workspace(display,& client_head, 6);
+			break;
+		
+		case WORKSPACE_7_KEY: 
+			switch_to_workspace(display,& client_head, 7);
+			break;
+
+		case WORKSPACE_8_KEY: 
+			switch_to_workspace(display,& client_head, 8);
+			break;
+	
+		case WORKSPACE_9_KEY: 
+			switch_to_workspace(display,& client_head, 9);
+			break;
+
+	}
+}
+
 int main() {
 	display = XOpenDisplay(NULL);
 	root = XDefaultRootWindow(display);
@@ -100,6 +142,16 @@ int main() {
 	grab_key_from_keysym(RESIZE_WINDOW_KEY, MODIFIER);
 	grab_key_from_keysym(FULL_SCREEN_KEY, MODIFIER);
 	grab_key_from_keysym(MINIMIZE_WINDOW_KEY, MODIFIER);
+	
+	grab_key_from_keysym(WORKSPACE_1_KEY, MODIFIER);
+	grab_key_from_keysym(WORKSPACE_2_KEY, MODIFIER);
+	grab_key_from_keysym(WORKSPACE_3_KEY, MODIFIER);
+	grab_key_from_keysym(WORKSPACE_4_KEY, MODIFIER);
+	grab_key_from_keysym(WORKSPACE_5_KEY, MODIFIER);
+	grab_key_from_keysym(WORKSPACE_6_KEY, MODIFIER);
+	grab_key_from_keysym(WORKSPACE_7_KEY, MODIFIER);
+	grab_key_from_keysym(WORKSPACE_8_KEY, MODIFIER);
+	grab_key_from_keysym(WORKSPACE_9_KEY, MODIFIER);
 
 
 	struct Inst_Set inst_set;
@@ -122,6 +174,7 @@ int main() {
 			KeySym ksym = XLookupKeysym(&e.xkey, 0);
 			unsigned int state = e.xkey.state;
 			if (state & MODIFIER) {
+				handle_workspace_switching_keys (ksym);
 				if (ksym == EXIT_WM_KEY) {
 					exit(0);
 				} else if (ksym == OPEN_APP_LAUNCHER_KEY) {

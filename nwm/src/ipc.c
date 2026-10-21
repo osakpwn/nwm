@@ -7,9 +7,12 @@
 
 #include "../include/ipc.h"
 
-void *new_socket_session() 
+void *new_socket_session(void *arg) 
 {
-	char *addr_str = "../nwm.sock";
+	struct Inst_Set *inst_set = arg;
+	char *addr_str = "/tmp/nwm.sock";
+	unlink(addr_str);
+
 	int fd = socket(AF_UNIX, SOCK_STREAM, 0);	
 	struct sockaddr_un addr;
 	addr.sun_family = AF_UNIX;

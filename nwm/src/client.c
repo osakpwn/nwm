@@ -6,6 +6,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+int current_workspace = 1; 
+
+
+void switch_to_workspace (Display *display, client_t **client_head, int id)
+{
+	current_workspace = id;
+	for (client_t *it = *client_head; it != NULL; it = it->next)		
+	{
+		if (it->workspace_id == get_current_workspace()) 
+		{
+			XMapWindow(display, it->frame);
+		}
+		else XUnmapWindow(display, it->frame);
+	}
+}
+
+int get_current_workspace ()
+{
+	return current_workspace;
+}
+
+
 client_t *find_client_using_window(client_t **client_head, Window win) {
 	for (client_t *it = *client_head; it != NULL; it = it->next) {
 		if (it->win == win)
@@ -99,6 +122,7 @@ void map_window(Display *display, Window *root, client_t **client_head,
 	c->prev_height = c->height;
 	c->window_close_request_sent = false;
 	c->is_minimized = false;
+	c->workspace_id = get_current_workspace();
 
 	XSelectInput(display, c->win,
 				 EnterWindowMask | LeaveWindowMask | PropertyChangeMask |
