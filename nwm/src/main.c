@@ -42,6 +42,17 @@ int initial_mouse_x = 0, initial_mouse_y = 0;
 int initial_win_x = 0, initial_win_y = 0;
 
 
+void set_focused_client (client_t *client)
+{
+	focused_client = client;
+}
+
+
+client_t *get_focused_client ()
+{
+	return focused_client;
+}
+
 
 client_t *get_client_head ()
 {

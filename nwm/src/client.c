@@ -12,6 +12,7 @@ int current_workspace = 1;
 
 void switch_to_workspace (Display *display, client_t **client_head, int id)
 {
+	set_focused_client(NULL);
 	current_workspace = id;
 	for (client_t *it = *client_head; it != NULL; it = it->next)		
 	{

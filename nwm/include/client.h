@@ -31,6 +31,7 @@ typedef struct {
 	int cap;
 } destroyed_winbuf;
 
+
 XWindowAttributes get_window_attr(Display *display, Window *win);
 client_t *find_client_using_window(client_t **client_head, Window win);
 void add_window_to_list(client_t **client_head, client_t *c);
@@ -44,4 +45,12 @@ void client_cleanup_loop(Display *display, client_t **client_head);
 
 void switch_to_workspace (Display *display, client_t **client_head, int id);
 int get_current_workspace ();
+
+
+client_t *get_client_head ();
+void set_client_head (client_t *ch);
+
+
+client_t *get_focused_client ();
+void set_focused_client (client_t *client);
 #endif
