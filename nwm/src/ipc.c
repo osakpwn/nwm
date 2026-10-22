@@ -5,11 +5,13 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include "../include/log.h"
 #include "../include/ipc.h"
+#include "../include/client.h"
 
 void *new_socket_session(void *arg) 
 {
-	struct Inst_Set *inst_set = arg;
+	FILE *logger = new_logger();
 	char *addr_str = "/tmp/nwm.sock";
 	unlink(addr_str);
 
@@ -21,7 +23,7 @@ void *new_socket_session(void *arg)
 	int code = bind(fd, (struct sockaddr *) &addr, sizeof(addr));
 	if (code < 0) 
 	{
-		printf("unable to bind socket!\n");
+		write_log(logger, "unable to bind socket!");
 		unlink(addr_str);
 		close(fd);
 		return 0;
@@ -30,30 +32,69 @@ void *new_socket_session(void *arg)
 	code = listen(fd, 5);
 	if (code < 0) 
 	{
-		printf("unable to listen!\n");
+		write_log(logger, "unable to listen!");
 		unlink(addr_str);
 		close(fd);
 		return 0;
 	}
 
 	int addrlen = sizeof(addr);
-	printf("listening for connections at %s\n", addr_str);
+	write_log(logger, "listening for connections at %s", addr_str);
 	while (1) 
 	{
 		char buf[1024];
 		int client_fd = accept(fd, (struct sockaddr *) &addr, (socklen_t *) &addrlen);
-		recv(client_fd, buf, sizeof(buf), 0);
-		printf("res: %s\n", buf);
+		ssize_t n = recv(client_fd, buf, sizeof(buf), 0);
+		if (n <= 0)
+		{
+			return NULL;
+
+		}
+
+
+		int len = strlen(buf); 
+		buf[len] = '\0';
+
+
+
+		write_log(logger, "from client %d:%s ", client_fd, buf);
 
 
 		if (strcmp(buf, "exit") == 0) 
 		{
-			printf("received exit signal...\n");
+			write_log(logger, "received exit signal...\n");
+			char b[] = "received exit signal...";
+			send(client_fd, b, strlen(b), 0);
 			unlink(addr_str);
 			close(fd);
 			exit(0);
 		}
+
+		else if (strcmp(buf, "windows") == 0)
+		{
+			int count = 0; 
+			for (client_t *it = get_client_head(); it != NULL; it = it->next)
+			{
+				count++;	
+			}
+
+
+			char b[100]; 
+			snprintf(b, sizeof(b), "number of windows open: %d", count);
+			send(client_fd, b, sizeof(b), 0);
+		}
+		else {
+			char b[2020];
+			snprintf(b, sizeof(b), "invalid command: %s", buf);
+			send(client_fd, b, strlen(b), 0);
+
+		}
+
+		
 		memset(buf, 0, sizeof(buf));
+
+		close(client_fd);
 	}
-	
+
+	close_logger(logger);	
 }
