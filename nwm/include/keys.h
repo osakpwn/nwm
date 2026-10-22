@@ -9,6 +9,7 @@
 #define UP_KEY XK_Up
 #define DOWN_KEY XK_Down
 #define MOD4_KEY Mod4Mask
+#define L_SHIFT_KEY XK_Shift_L
 #define WORKSPACE_1_KEY XK_1
 #define WORKSPACE_2_KEY XK_2
 #define WORKSPACE_3_KEY XK_3
