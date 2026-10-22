@@ -4,6 +4,7 @@ X11 window manager to fix the issues with meadow.
 
 ### Screenshot
 ![Screenshot](./static/screenshot.png) 
+![Screenshot](./static/screenshot2.png) 
 
 ### Actual features 
 - opens (yayy)
