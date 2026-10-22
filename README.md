@@ -27,6 +27,7 @@ There are two ways to run this window manager
 1. you can run the window manager as nested window using [Xephyr](https://en.wikipedia.org/wiki/Xephyr). To run simply install it and then using the provided `Makefile`, do:
 
 ```bash 
+cd nwm/nwm
 make build && make run
 ```
 
@@ -38,7 +39,7 @@ make build && make run
 
 ## Default key bindings 
 
-- Mod + q = Exit window manager
+- Mod + Shift + q = Exit window manager
 - Mod + Space = Open application launcher (dmenu by default but can be changed in `config.h`)
 - Mod + r to toggle `resize mode`. When in resize mode, use arrow keys to resize window 
 - Mod + m to toggle `move mode`. When in move mode, use arrow keys to move window 
@@ -47,6 +48,7 @@ make build && make run
 ## Other key bindings 
 - Mod + f to toggle fullscreen
 - Mod + u to hide/show window
+- Mod + [1-9] to switch workspaces
 
 ## Window colour modes
 Window borders have different colours based on input mode 
